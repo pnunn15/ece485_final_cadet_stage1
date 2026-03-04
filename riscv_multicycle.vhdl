@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------
 -- Final Project Stage 1: RISCV_Multicycle
--- AUTHOR: 
+-- AUTHOR: C1C Payton Nunn
 -- DESCRIPTION:
 --   Implementation of a 5 stage RISC-V multicycle architecture (IF-ID-EX-MEM-WB)
 --   that is NOT pipelined [all 5 stages of the first instruction completes before
@@ -230,19 +230,19 @@ begin
     
     -- IF/ID pipeline register
     if_id_instr <= instr;
-
+    if_id_npc <= NPC;
     -------------------------- ID state hardware ---------------------------------------------
     -- Decode instruction fields
-    rs1 <= if_id_instr(<define bit> downto <define bit>);
-    rs2 <= if_id_instr(<define bit> downto <define bit>);
-    rd  <= if_id_instr(<define bit> downto <define bit>);
-    opcode <= if_id_instr(<define bit> downto <define bit>);
+    rs1 <= if_id_instr(19 downto 15);
+    rs2 <= if_id_instr(24 downto 20);
+    rd  <= if_id_instr(11 downto 7);
+    opcode <= if_id_instr(6 downto 0);
 
     -- ALU control unit
     alu_control_inst: alu_control
         port map (
-            funct3 => if_id_instr(<define bit> downto <define bit>),
-            funct7 => if_id_instr(<define bit> downto <define bit>),
+            funct3 => if_id_instr(14 downto 12),
+            funct7 => if_id_instr(31 downto 25),
             alu_op => alu_op
         );
 
@@ -254,7 +254,7 @@ begin
             rs1       => rs1,
             rs2       => rs2,
             rd        => wb_rd,
-            data_in   => <which_register>,  -- see writeback stage where mux selects correct value to write to register
+            data_in   => wb_data,  -- see writeback stage where mux selects correct value to write to register, wb_data?
             data_out1 => reg1_data,
             data_out2 => reg2_data
         );
@@ -280,29 +280,47 @@ begin
         );
 
     -- ID/EX pipeline register
+    id_ex_alu_op <= alu_op;
+    id_ex_rd <= if_id_instr(11 downto 7);
     id_ex_reg1_data <= reg1_data;
     id_ex_reg2_data <= reg2_data;
     id_ex_imm  <= imm;
-
+    id_ex_npc <= if_id_npc;
+    id_ex_reg_write <= reg_write;
+    id_ex_alu_src <= alu_src;
+    id_ex_mem_read <= mem_read;
+    id_ex_mem_write <= mem_write;
+    id_ex_branch <= branch;
+    id_ex_jump <= jump;
+    id_ex_load_addr <= load_addr;
     -------------------------- EX state hardware ---------------------------------------------
     
-    alu_input_a <= reg1_data;
+    alu_input_a <= id_ex_reg1_data;
     -- mux to select alu input B
-    alu_input_b <= <which_register> when <which_control_signal> else
-                   <which_register>;
+    alu_input_b <= id_ex_imm when id_ex_alu_src = '1' else
+                   id_ex_reg2_data;
     -- ALU
     alu_inst: alu
         port map (
             a      => alu_input_a,
             b      => alu_input_b,
-            op     => alu_op,
+            op     => id_ex_alu_op,
             result => alu_result
         );
 
     -- EX/MEM pipeline register
     ex_mem_alu  <= alu_result;
+    ex_mem_rd <= id_ex_rd;
     ex_mem_reg2_data <= id_ex_reg2_data;
-
+    ex_mem_npc <= id_ex_npc;
+    ex_mem_imm <= id_ex_imm;
+    ex_mem_reg_write <= id_ex_reg_write;
+    ex_mem_alu_src <= id_ex_alu_src;
+    ex_mem_mem_read <= id_ex_mem_read;
+    ex_mem_mem_write <= id_ex_mem_write;
+    ex_mem_branch <= id_ex_branch;
+    ex_mem_jump <= id_ex_jump;
+    ex_mem_load_addr <= id_ex_load_addr;
     -------------------------- MEM state hardware ---------------------------------------------
     
     -- Data memory
@@ -310,7 +328,7 @@ begin
     data_mem_inst: data_mem
         port map (
             addr      => data_memory_byte_not_word,
-            data_in   => <which_register?>,
+            data_in   => ex_mem_reg2_data,
             data_out  => mem_data,
             mem_read  => mem_read,
             mem_write => mem_write_chip  -- write is dangerous... only want to do this on a specific clock cycle
@@ -318,24 +336,32 @@ begin
 
     -- Moore Machine, outputs determined by State
     -- MEMORY
-    mem_write_chip <= '1' when (state = MEMORY and <what control signals?>) else '0';  -- ensure only write to memory during this state
-    next_pc <= <math based on NPC and imm> when (state = MEMORY and <when do we want to branch?>) else
-               <math based on NPC and imm> when (state = MEMORY and <when do we want to jump?>) else
-               NPC when state = MEMORY and <when do we want to do PC+4?> else
+    mem_write_chip <= '1' when (state = MEMORY and mem_write = '1') else '0';  -- ensure only write to memory during this state
+    next_pc <= std_logic_vector(signed(ex_mem_npc) + signed(ex_mem_imm)) when (state = MEMORY and ex_mem_branch = '1' and ex_mem_alu /= x"00000000") else
+               std_logic_vector(signed(ex_mem_npc) + signed(ex_mem_imm)) when (state = MEMORY and ex_mem_jump = '1') else
+               ex_mem_npc when state = MEMORY and (ex_mem_jump = '0' and (ex_mem_branch = '0' or ex_mem_alu = x"00000000")) else
                next_pc;  -- otherwise, keep the same pc until time to update
 
     -------------------------- WB state hardware ---------------------------------------------
     -- MEM/WB pipeline register
     mem_wb_alu  <= ex_mem_alu;
+    mem_wb_rd <= ex_mem_rd;
     mem_wb_data <= mem_data;
+    mem_wb_reg_write <= ex_mem_reg_write;
+    mem_wb_alu_src <= ex_mem_alu_src;
+    mem_wb_mem_read <= ex_mem_mem_read;
+    mem_wb_mem_write <= ex_mem_mem_write;
+    mem_wb_branch <= ex_mem_branch;
+    mem_wb_jump <= ex_mem_jump;
+    mem_wb_load_addr <= ex_mem_load_addr;
 
     -- Moore Machine, outputs determined by State
-    reg_write_chip <= '1' when (state = WRITEBACK and <what control signals?>) else '0'; -- ensure only write to registers during this state
+    reg_write_chip <= '1' when (state = WRITEBACK and mem_wb_reg_write = '1') else '0'; -- ensure only write to registers during this state
     if_id_pc   <= next_pc when state = WRITEBACK else if_id_pc; -- only lets this update during WRITEBACK
-    wb_data <= x"10000000" when (state = WRITEBACK and <what control signals?>) else
-               mem_wb_data when (state = WRITEBACK and <what control signals?>) else
-               mem_wb_alu  when (state = WRITEBACK and <what control signals?>) else
+    wb_data <= x"10000000" when (state = WRITEBACK and mem_wb_load_addr = '1') else
+               mem_wb_data when (state = WRITEBACK and mem_wb_mem_read = '1') else
+               mem_wb_alu  when (state = WRITEBACK and mem_wb_reg_write = '1') else
                wb_data;  -- only allow this to change during Writeback
 
-    wb_rd   <= if_id_instr(<define bit> downto <define bit>); -- Destination register
+    wb_rd   <= mem_wb_rd; -- Destination register
 end Behavioral;

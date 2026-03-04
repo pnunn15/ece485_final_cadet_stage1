@@ -1,4 +1,3 @@
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
@@ -41,12 +40,13 @@ begin
                     imm <= "1111111111111111111111" & instr(7) &  instr(30 downto 25) & instr(11 downto 9); 
                 end if;                
             when "1101111" => -- J
-                 if instr(31) = '0' then  -- positive
-                    -- imm math points to a byte, not 16-bit or word
-                    imm <= "000000000000" & instr(31) & instr(21 downto 12) & instr(22) & instr(30 downto 23);
+                -- imm math points to a byte, not 16-bit or word
+                -- ethan chapman change
+                if instr(31) = '0' then  -- positive
+                    imm <= "000000000000" & instr(31) & instr(19 downto 12) & instr(20) & instr(30 downto 21);
                 else -- negative
-                    imm <= "111111111111" & instr(31) & instr(21 downto 12) & instr(22) & instr(30 downto 23);
-                end if;              
+                    imm <= "111111111111" & instr(31) & instr(19 downto 12) & instr(20) & instr(30 downto 21);
+                end if;        
             when others =>
                 imm <= (others => '0');
         end case;

@@ -18,8 +18,8 @@ begin
         case funct3 is
             when "000" => -- ADD
                 alu_op <= "0000"; -- ADD
-            when "<code for subtract>" => -- SUB
-                alu_op <= "<code ALU needs for subtract>"; -- SUB
+            when "001" => -- SUB
+                alu_op <= "1111"; -- SUB
             when others =>
                 alu_op <= (others => '0');
         end case;

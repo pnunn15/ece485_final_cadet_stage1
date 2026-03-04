@@ -1,0 +1,28 @@
+#-----------------------------------------------------------
+# Vivado v2025.2 (64-bit)
+# SW Build 6299465 on Fri Nov 14 19:35:11 GMT 2025
+# IP Build 6300035 on Fri Nov 14 10:48:45 MST 2025
+# SharedData Build 6298862 on Thu Nov 13 04:50:51 MST 2025
+# Start of session at: Thu Feb 26 15:35:49 2026
+# Process ID         : 472
+# Current directory  : D:/ece485_final_cadet_stage1
+# Command line       : vivado.exe -gui_launcher_event rodinguilauncherevent26468 D:\ece485_final_cadet_stage1\ece485_final_cadet_stage1.xpr
+# Log file           : D:/ece485_final_cadet_stage1/vivado.log
+# Journal file       : D:/ece485_final_cadet_stage1\vivado.jou
+# Running On         : myLaptop
+# Platform           : Windows Server 2016 or Windows 10
+# Operating System   : 26200
+# Processor Detail   : AMD Ryzen 9 5980HX with Radeon Graphics        
+# CPU Frequency      : 3294 MHz
+# CPU Physical cores : 8
+# CPU Logical cores  : 16
+# Host memory        : 33720 MB
+# Swap memory        : 2147 MB
+# Total Virtual      : 35868 MB
+# Available Virtual  : 19805 MB
+#-----------------------------------------------------------
+start_gui
+open_project D:/ece485_final_cadet_stage1/ece485_final_cadet_stage1.xpr
+upgrade_project -migrate_output_products
+update_compile_order -fileset sources_1
+update_compile_order -fileset sim_1
