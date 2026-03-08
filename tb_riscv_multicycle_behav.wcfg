@@ -10,13 +10,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="3320845922fs"></ZoomEndTime>
-      <Cursor1Time time="800000000fs"></Cursor1Time>
+      <ZoomStartTime time="83.500 ns"></ZoomStartTime>
+      <ZoomEndTime time="421.301 ns"></ZoomEndTime>
+      <Cursor1Time time="365.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="161"></NameColumnWidth>
-      <ValueColumnWidth column_width="129"></ValueColumnWidth>
+      <NameColumnWidth column_width="165"></NameColumnWidth>
+      <ValueColumnWidth column_width="113"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="33" />
    <wvobject fp_name="/tb_riscv_multicycle/clk" type="logic">
@@ -57,6 +57,7 @@
    <wvobject fp_name="/tb_riscv_multicycle/uut/opcode" type="array">
       <obj_property name="ElementShortName">opcode[6:0]</obj_property>
       <obj_property name="ObjectShortName">opcode[6:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_riscv_multicycle/uut/rs1" type="array">
       <obj_property name="ElementShortName">rs1[4:0]</obj_property>
@@ -89,7 +90,7 @@
    <wvobject fp_name="/tb_riscv_multicycle/uut/imm" type="array">
       <obj_property name="ElementShortName">imm[31:0]</obj_property>
       <obj_property name="ObjectShortName">imm[31:0]</obj_property>
-      <obj_property name="Radix">BINARYRADIX</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_riscv_multicycle/uut/alu_input_b" type="array">
       <obj_property name="ElementShortName">alu_input_b[31:0]</obj_property>

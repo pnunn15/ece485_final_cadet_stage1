@@ -57,7 +57,7 @@ begin
         wait for 30 ns;
 
         -- Run the simulation for enough time to complete 10 iterations
-        wait for 1000 ns;
+        wait for 3000 ns;
 
         -- End simulation
         wait;
