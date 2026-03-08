@@ -1,2 +1,2 @@
-INFO: [VRFC 10-163] Analyzing VHDL file "D:/ece485_final_cadet_stage1/tb_riscv_multicycle.vhdl" into library xil_defaultlib
-INFO: [VRFC 10-3107] analyzing entity 'tb_riscv_multicycle'
+INFO: [VRFC 10-163] Analyzing VHDL file "D:/ece485_final_cadet_stage1/instr_mem.vhdl" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'instr_mem'
